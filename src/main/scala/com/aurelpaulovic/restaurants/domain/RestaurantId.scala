@@ -8,4 +8,8 @@ object RestaurantId {
   def random: RestaurantId = {
     RestaurantId(UUID.randomUUID())
   }
+
+  def fromUUID(id: UUID): RestaurantId = {
+    RestaurantId(id)
+  }
 }

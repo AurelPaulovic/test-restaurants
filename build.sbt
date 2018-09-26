@@ -54,15 +54,16 @@ lazy val depsFunc = Seq(
 )
 
 lazy val depsServer = Seq(
-  "com.twitter" %% "finatra-http" % "18.9.0" 
+  "com.twitter" %% "finatra-http" % "18.9.0"
 )
 
 lazy val depsConcurrent = Seq(
   "io.monix" %% "monix" % "3.0.0-RC1"
 )
 
-lazy val depsDB = Seq(
-
+lazy val depsDb = Seq(
+  "org.tpolecat" %% "doobie-core" % "0.5.3",
+  "org.tpolecat" %% "doobie-postgres" % "0.5.3"
 )
 
 lazy val depsTests = Seq(
@@ -71,7 +72,11 @@ lazy val depsTests = Seq(
   "org.scalacheck" %% "scalacheck" % "1.14.0" % Test
 )
 
-libraryDependencies ++= depsLogging ++ depsFunc ++ depsServer ++ depsConcurrent ++ depsDB ++ depsTests
+lazy val depsDbTests = Seq(
+  "org.tpolecat" %% "doobie-scalatest" % "0.5.3" % Test
+)
+
+libraryDependencies ++= depsLogging ++ depsFunc ++ depsServer ++ depsConcurrent ++ depsDb ++ depsTests ++ depsDbTests
 
 test in assembly := {}
 

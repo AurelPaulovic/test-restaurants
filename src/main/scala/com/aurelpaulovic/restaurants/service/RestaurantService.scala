@@ -17,11 +17,11 @@ trait RestaurantService {
 
 class RestaurantServiceImpl (persistence: RestaurantPersistence) extends RestaurantService {
   override def getRestaurant(id: domain.RestaurantId): Task[Option[domain.Restaurant]] = {
-    Task.now(None: Option[domain.Restaurant])
+    persistence.getRestaurant(id)
   }
 
   override def getRestaurantsList(): Task[Seq[domain.Restaurant]] = {
-    Task.now(Seq.empty)
+    persistence.getRestaurants()
   }
 
   override def deleteRestaurant(id: domain.RestaurantId): Task[Unit] = {
