@@ -46,6 +46,11 @@ assemblyMergeStrategy in assembly := {
 
 assemblyJarName in assembly := "restaurants.jar"
 
+resolvers ++= Seq(
+  "Twitter maven" at "http://maven.twttr.com",
+  "Finatra Repo" at "http://twitter.github.com/finatra"
+)
+
 lazy val depsLogging = Seq(
   "ch.qos.logback" % "logback-classic" % "1.2.3",
   "com.typesafe.scala-logging" %% "scala-logging" % "3.9.0"
@@ -60,6 +65,7 @@ lazy val depsServer = Seq(
 )
 
 lazy val depsConcurrent = Seq(
+
   "io.monix" %% "monix" % "3.0.0-RC1"
 )
 
@@ -78,7 +84,25 @@ lazy val depsDbTests = Seq(
   "org.tpolecat" %% "doobie-scalatest" % "0.5.3" % Test
 )
 
-libraryDependencies ++= depsLogging ++ depsFunc ++ depsServer ++ depsConcurrent ++ depsDb ++ depsTests ++ depsDbTests
+lazy val depsServerTests = Seq(
+  "com.twitter" %% "finatra-http" % "18.9.0" % Test classifier "tests",
+  "com.twitter" %% "finatra-http" % "18.9.0" % Test,
+  "com.twitter" %% "inject-core" % "18.9.0" % Test classifier "tests",
+  "com.twitter" %% "inject-core" % "18.9.0" % Test,
+  "com.twitter" %% "inject-modules" % "18.9.0" % Test classifier "tests",
+  "com.twitter" %% "inject-modules" % "18.9.0" % Test,
+  "com.twitter" %% "inject-app" % "18.9.0" % Test classifier "tests",
+  "com.twitter" %% "inject-app" % "18.9.0" % Test,
+  "com.twitter" %% "inject-server" % "18.9.0" % Test classifier "tests",
+  "com.twitter" %% "inject-server" % "18.9.0" % Test,
+  "com.google.inject" % "guice" % "4.0" % Test,
+  "com.google.inject.extensions" % "guice-testlib" % "4.0" % Test,
+  "org.mockito" % "mockito-core" %  "1.9.5" % Test,
+  "com.twitter" %% "finatra-jackson" % "18.9.0" % Test classifier "tests",
+  "com.twitter" %% "finatra-jackson" % "18.9.0" % Test
+)
+
+libraryDependencies ++= depsLogging ++ depsFunc ++ depsServer ++ depsConcurrent ++ depsDb ++ depsTests ++ depsDbTests ++ depsServerTests
 
 test in assembly := {}
 

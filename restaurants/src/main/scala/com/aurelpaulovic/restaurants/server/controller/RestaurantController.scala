@@ -34,7 +34,7 @@ class RestaurantController @Inject() (restaurantService: RestaurantService) exte
       .runAndConvert
   }
 
-  put("/restaurants/:id") { req: input.UpdateRestaurant =>
+  put("/restaurants") { req: input.UpdateRestaurant =>
     restaurantService
       .updateRestaurant(req.restaurant)
       .map {
