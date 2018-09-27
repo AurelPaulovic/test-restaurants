@@ -37,6 +37,8 @@ mainClass in (Compile, run) := Some("com.aurelpaulovic.restaurants.Server")
 mainClass in (Compile, packageBin) := Some("com.aurelpaulovic.restaurants.Server")
 
 assemblyMergeStrategy in assembly := {
+  case PathList("org", "apache", "commons", "logging", xs @ _*) => MergeStrategy.first
+  case PathList("org", "slf4j", xs @ _*) => MergeStrategy.first
   case "BUILD" => MergeStrategy.discard
   case "META-INF/io.netty.versions.properties" => MergeStrategy.last
   case other => MergeStrategy.defaultMergeStrategy(other)
