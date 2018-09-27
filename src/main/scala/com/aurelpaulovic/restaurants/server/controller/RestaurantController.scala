@@ -45,8 +45,8 @@ class RestaurantController @Inject() (restaurantService: RestaurantService) exte
       .map {
         case None =>
           response.notFound
-        case Some(restaurant) =>
-          response.ok(output.Restaurant.fromDomain(restaurant))
+        case Some(_) =>
+          response.ok
       }
       .runAndConvert
   }
