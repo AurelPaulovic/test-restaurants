@@ -21,6 +21,8 @@ object RestaurantPersistenceModule extends TwitterModule {
     @Flag("db.pass") dbPass: String,
     @Flag("db.hostport") dbHostPort: String
   ): RestaurantPersistence = {
+    // TODO: we want to use some connection pooling mechanism, e.g. HikariCP
+
     val mxa = Transactor.fromDriverManager[Task](
       "org.postgresql.Driver", s"jdbc:postgresql://$dbHostPort/$dbName", dbUser, dbPass
     )

@@ -81,7 +81,7 @@ class RestaurantServiceImpl (persistence: RestaurantPersistence) extends Restaur
     persistence.createRestaurant(restaurantToInsert)
       .flatMap {
         case Left(RestaurantPersistence.CreateRestaurantError.IdIsAlreadyUsed) =>
-          Task.raiseError(new CreateRestaurantException("Non-unique restaurant ID"))
+          Task.raiseError(CreateRestaurantException("Non-unique restaurant ID"))
         case Right(insertedRestaurant) =>
           Task.now(insertedRestaurant)
       }

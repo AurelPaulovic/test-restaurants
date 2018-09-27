@@ -130,11 +130,11 @@ class DbRestaurantPersistence (transactor: Transactor.Aux[Task, Unit]) extends R
     sql"SELECT version()"
       .query[String]
       .unique
-      .attempt
       .transact(transactor)
+      .attempt
       .map{
         case Left(error) =>
-          logger.error(s"Database healthcheck failed with error: ${error}")
+          logger.error(s"Database healthcheck failed with error: ${error.getMessage}")
           false
         case Right(_) =>
           true
