@@ -11,26 +11,58 @@ import monix.eval.Task
 trait RestaurantPersistence {
   import RestaurantPersistence._
 
+  /** Searches for a restaurant based on its id and returns it if found
+    *
+    * @param id the id of the restaurant
+    * @return `Some` of the found restaurant, or `None` if there is no restaurant with given `id`
+    */
   def getRestaurant(id: domain.RestaurantId): Task[Option[domain.Restaurant]]
 
+  /** Lists all stored restaurants sorted by their id
+    *
+    * @return sequence of all stored restaurants
+    */
   def getRestaurants: Task[Seq[domain.Restaurant]]
 
+  /** Deletes a restaurant based on its id and returns the deleted restaurant
+    *
+    * @param id the id of the restaurant
+    * @return `Some` of the deleted restaurant, `None` if there was no restaurant with fiven `id`
+    */
   def deleteRestaurant(id: domain.RestaurantId): Task[Option[domain.Restaurant]]
 
+  /** Updates a restaurant based on its id and returns the resulting restaurant
+    *
+    * @param restaurant the restaurant with its updated data
+    * @return `Some` of the updated restaurant, `None` if the restaurant does not exist
+    */
   def updateRestaurant(restaurant: domain.Restaurant): Task[Option[domain.Restaurant]]
 
+  /** Persists the restaurant
+    *
+    * @param restaurant the restaurant to persist
+    * @return `Right` of the persisted restaurant, `Left` in case of an error
+    */
   def createRestaurant(restaurant: domain.Restaurant): Task[Either[CreateRestaurantError, domain.Restaurant]]
 
+  /** Performs health check
+    *
+    * @return `true` if the service is ok, `false` otherwise
+    */
   def healthCheck: Task[Boolean]
 }
 
 object RestaurantPersistence {
   private[service] val logger = Logger[RestaurantPersistence]
 
+  /** Errors that can happen when persisting new restaurants
+    */
   sealed trait CreateRestaurantError
 
   object CreateRestaurantError {
-    case object IdIsAlreadyUsed extends CreateRestaurantError
+    /** Restaurant with given id already exists
+      */
+    final case object IdIsAlreadyUsed extends CreateRestaurantError
   }
 }
 
