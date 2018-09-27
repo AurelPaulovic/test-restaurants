@@ -2,20 +2,15 @@ package com.aurelpaulovic.restaurants.server.controller
 
 import com.aurelpaulovic.restaurants.service.RestaurantService
 import com.google.inject.Inject
-import com.twitter.finagle.http.{Request, ResponseProxy}
+import com.twitter.finagle.http.Request
 import com.twitter.finatra.http.Controller
-import monix.eval.Task
-import monix.execution.Scheduler
 import monix.execution.Scheduler.Implicits.global
 
-import scala.concurrent.Future
 
-class RestaurantController @Inject() (restaurantService: RestaurantService) extends Controller {
-  import RestaurantController._
-
+class RestaurantController @Inject() (restaurantService: RestaurantService) extends Controller with ControllerUtils {
   get("/restaurants") { req: Request =>
     restaurantService
-      .getRestaurantsList()
+      .getRestaurantsList
       .map(_.map(output.Restaurant.fromDomain))
       .runAndConvert
   }
@@ -55,16 +50,5 @@ class RestaurantController @Inject() (restaurantService: RestaurantService) exte
     restaurantService
       .deleteRestaurant(req.restaurantId)
       .runAndConvert
-  }
-}
-
-object RestaurantController {
-  implicit class MonixTaskHelper[T] (val task: Task[T]) extends AnyVal {
-    /** Asynchronously runs the Monix task using provided scheduler and converts it into result that Finatra understands
-      * and accepts as controller route' return value
-      */
-    def runAndConvert(implicit scheduler: Scheduler): Future[ResponseProxy] = {
-      task.runAsync(scheduler).asInstanceOf[Future[ResponseProxy]]
-    }
   }
 }

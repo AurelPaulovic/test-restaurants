@@ -4,6 +4,7 @@ import java.util.UUID
 
 import com.aurelpaulovic.restaurants.domain
 import com.aurelpaulovic.restaurants.service.RestaurantPersistence.CreateRestaurantError.IdIsAlreadyUsed
+import com.typesafe.scalalogging.Logger
 import doobie.util.transactor.Transactor
 import monix.eval.Task
 
@@ -12,16 +13,20 @@ trait RestaurantPersistence {
 
   def getRestaurant(id: domain.RestaurantId): Task[Option[domain.Restaurant]]
 
-  def getRestaurants(): Task[Seq[domain.Restaurant]]
+  def getRestaurants: Task[Seq[domain.Restaurant]]
 
   def deleteRestaurant(id: domain.RestaurantId): Task[Option[domain.Restaurant]]
 
   def updateRestaurant(restaurant: domain.Restaurant): Task[Option[domain.Restaurant]]
 
   def createRestaurant(restaurant: domain.Restaurant): Task[Either[CreateRestaurantError, domain.Restaurant]]
+
+  def healthCheck: Task[Boolean]
 }
 
 object RestaurantPersistence {
+  private[service] val logger = Logger[RestaurantPersistence]
+
   sealed trait CreateRestaurantError
 
   object CreateRestaurantError {
@@ -35,6 +40,7 @@ class DbRestaurantPersistence (transactor: Transactor.Aux[Task, Unit]) extends R
   import doobie._
   import doobie.implicits._
   import doobie.postgres.implicits._
+  import cats.implicits._
 
   override def getRestaurant(id: domain.RestaurantId): Task[Option[domain.Restaurant]] = {
     sql"SELECT id, name, cuisines, phone, address, description FROM restaurants WHERE id = ${id.value}"
@@ -45,7 +51,7 @@ class DbRestaurantPersistence (transactor: Transactor.Aux[Task, Unit]) extends R
   }
 
 
-  override def getRestaurants(): Task[Seq[domain.Restaurant]] = {
+  override def getRestaurants: Task[Seq[domain.Restaurant]] = {
     sql"SELECT id, name, cuisines, phone, address, description FROM restaurants ORDER BY id"
       .query[RestaurantRow]
       .map(_.toDomain)
@@ -86,6 +92,21 @@ class DbRestaurantPersistence (transactor: Transactor.Aux[Task, Unit]) extends R
         case doobie.postgres.sqlstate.class23.UNIQUE_VIOLATION => IdIsAlreadyUsed
       }
       .transact(transactor)
+  }
+
+  override def healthCheck: Task[Boolean] = {
+    sql"SELECT version()"
+      .query[String]
+      .unique
+      .attempt
+      .transact(transactor)
+      .map{
+        case Left(error) =>
+          logger.error(s"Database healthcheck failed with error: ${error}")
+          false
+        case Right(_) =>
+          true
+      }
   }
 }
 

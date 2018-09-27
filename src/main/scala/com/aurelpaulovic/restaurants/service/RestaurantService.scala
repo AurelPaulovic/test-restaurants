@@ -8,13 +8,15 @@ import monix.eval.Task
 trait RestaurantService {
   def getRestaurant(id: domain.RestaurantId): Task[Option[domain.Restaurant]]
 
-  def getRestaurantsList(): Task[Seq[domain.Restaurant]]
+  def getRestaurantsList: Task[Seq[domain.Restaurant]]
 
   def deleteRestaurant(id: domain.RestaurantId): Task[Unit]
 
   def createRestaurant(name: String, phone: domain.PhoneNumber, address: domain.Address, description: Option[domain.Description], cuisines: Seq[domain.Cuisine]): Task[domain.Restaurant]
 
   def updateRestaurant(restaurant: domain.Restaurant): Task[Option[domain.Restaurant]]
+
+  def healthCheck: Task[Boolean]
 }
 
 class RestaurantServiceImpl (persistence: RestaurantPersistence) extends RestaurantService {
@@ -24,8 +26,8 @@ class RestaurantServiceImpl (persistence: RestaurantPersistence) extends Restaur
     persistence.getRestaurant(id)
   }
 
-  override def getRestaurantsList(): Task[Seq[domain.Restaurant]] = {
-    persistence.getRestaurants()
+  override def getRestaurantsList: Task[Seq[domain.Restaurant]] = {
+    persistence.getRestaurants
   }
 
   override def deleteRestaurant(id: domain.RestaurantId): Task[Unit] = {
@@ -35,7 +37,7 @@ class RestaurantServiceImpl (persistence: RestaurantPersistence) extends Restaur
   }
 
   override def createRestaurant(name: String, phone: domain.PhoneNumber, address: domain.Address, description: Option[domain.Description], cuisines: Seq[domain.Cuisine]): Task[domain.Restaurant] = {
-    val restaurant = domain.Restaurant(
+    val restaurantToInsert = domain.Restaurant(
       id = domain.RestaurantId.random,
       name = name,
       cuisines = cuisines,
@@ -44,7 +46,7 @@ class RestaurantServiceImpl (persistence: RestaurantPersistence) extends Restaur
       description = description
     )
 
-    persistence.createRestaurant(restaurant)
+    persistence.createRestaurant(restaurantToInsert)
       .flatMap {
         case Left(RestaurantPersistence.CreateRestaurantError.IdIsAlreadyUsed) =>
           Task.raiseError(new CreateRestaurantException("Non-unique restaurant ID"))
@@ -55,6 +57,10 @@ class RestaurantServiceImpl (persistence: RestaurantPersistence) extends Restaur
 
   override def updateRestaurant(restaurant: domain.Restaurant): Task[Option[domain.Restaurant]] = {
     persistence.updateRestaurant(restaurant)
+  }
+
+  override def healthCheck: Task[Boolean] = {
+    persistence.healthCheck
   }
 }
 

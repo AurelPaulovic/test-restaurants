@@ -1,6 +1,6 @@
 package com.aurelpaulovic.restaurants
 
-import com.aurelpaulovic.restaurants.server.controller.RestaurantController
+import com.aurelpaulovic.restaurants.server.controller.{HealthCheckController, RestaurantController}
 import com.aurelpaulovic.restaurants.server.module.RestaurantServiceModule
 import com.twitter.finatra.http.HttpServer
 import com.twitter.finatra.http.filters.CommonFilters
@@ -17,6 +17,7 @@ class FinatraServer extends HttpServer {
     router
       .filter[CommonFilters]
       .add[RestaurantController]
+      .add[HealthCheckController]
 
     ()
   }
