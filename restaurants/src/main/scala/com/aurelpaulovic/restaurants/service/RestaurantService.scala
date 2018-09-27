@@ -55,7 +55,16 @@ class RestaurantServiceImpl (persistence: RestaurantPersistence) extends Restaur
   import RestaurantService.logger
 
   override def getRestaurant(id: domain.RestaurantId): Task[Option[domain.Restaurant]] = {
-    persistence.getRestaurant(id)
+    persistence
+      .getRestaurant(id)
+      .map {
+        case None =>
+          logger.debug(s"Did not find restaurant with id [$id]")
+          None
+        case res =>
+          logger.debug(s"Found restaurant with id [$id]")
+          res
+      }
   }
 
   override def getRestaurantsList: Task[Seq[domain.Restaurant]] = {
@@ -64,7 +73,7 @@ class RestaurantServiceImpl (persistence: RestaurantPersistence) extends Restaur
 
   override def deleteRestaurant(id: domain.RestaurantId): Task[Unit] = {
     persistence.deleteRestaurant(id).map { maybeRestaurant =>
-      maybeRestaurant.foreach(restaurant => logger.info(s"Deleted restaurant [$restaurant]"))
+      maybeRestaurant.foreach(restaurant => logger.debug(s"Deleted restaurant [$restaurant]"))
     }
   }
 
@@ -81,14 +90,25 @@ class RestaurantServiceImpl (persistence: RestaurantPersistence) extends Restaur
     persistence.createRestaurant(restaurantToInsert)
       .flatMap {
         case Left(RestaurantPersistence.CreateRestaurantError.IdIsAlreadyUsed) =>
+          logger.error(s"Could not create restaurant due to duplicate id [${restaurantToInsert.id}] ")
           Task.raiseError(CreateRestaurantException("Non-unique restaurant ID"))
         case Right(insertedRestaurant) =>
+          logger.debug(s"Created new restaurant with id [${insertedRestaurant.id}]")
           Task.now(insertedRestaurant)
       }
   }
 
   override def updateRestaurant(restaurant: domain.Restaurant): Task[Option[domain.Restaurant]] = {
-    persistence.updateRestaurant(restaurant)
+    persistence
+      .updateRestaurant(restaurant)
+      .map {
+        case None =>
+          logger.debug(s"Could not update restaurant with id [${restaurant.id}] because it does not exist")
+          None
+        case res =>
+          logger.debug(s"Updated restaurant with id [${restaurant.id}]")
+          res
+      }
   }
 
   override def healthCheck: Task[Boolean] = {

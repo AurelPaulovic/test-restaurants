@@ -1,0 +1,7 @@
+{
+    "name": "Restaurant 1",
+    "address": "address of Restaurant 1",
+    "phone": "phone of Restaurant 1",
+    "description": "description of Restaurant 1",
+    "cuisines": ["cuisine 1", "cuisine 2", "cuisine 3"]
+}
