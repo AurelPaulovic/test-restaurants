@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 
-curl -H "Content-Type:application/json" --data @restaurant1.json localhost:8888/restaurants
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
+
+curl -H "Content-Type:application/json" --data @${DIR}/restaurant1.json localhost:8888/restaurants
 echo ""
-curl -H "Content-Type:application/json" --data @restaurant2.json localhost:8888/restaurants
+curl -H "Content-Type:application/json" --data @${DIR}/restaurant2.json localhost:8888/restaurants
 echo ""
-curl -H "Content-Type:application/json" --data @restaurant3.json localhost:8888/restaurants
+curl -H "Content-Type:application/json" --data @${DIR}/restaurant3.json localhost:8888/restaurants
 echo ""
